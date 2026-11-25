@@ -165,6 +165,13 @@ Settings loadSettings(const std::string& file) {
     cfg.ip = std::string(robot["ip"]);
     cfg.reference = numbers(robot["grasp_reference_pose"], 6, "grasp_reference_pose", true);
     cfg.park = numbers(robot["park_pose"], 6, "park_pose", true);
+    const auto motionZ = [&](const char* key, double fallback) {
+        const auto value = robot[key];
+        return value.isNone() ? fallback : number(value, key);
+    };
+    cfg.safeZ = motionZ("safe_z_m", cfg.park.empty() ? 0.0 : cfg.park[2]);
+    cfg.liftZ = motionZ("lift_z_m", cfg.safeZ);
+    cfg.placeZ = motionZ("place_z_m", cfg.reference.empty() ? 0.0 : cfg.reference[2]);
     cfg.referenceAngle = number(robot["grasp_reference_long_axis_deg"], "grasp_reference_long_axis_deg") * (pi / 180);
     cfg.travelSpeed = number(robot["travel_speed_m_s"], "travel_speed_m_s");
     cfg.contactSpeed = number(robot["contact_speed_m_s"], "contact_speed_m_s");

@@ -47,6 +47,7 @@ struct Settings {
     Layout layout;
     std::string ip;
     Pose reference, park;
+    double safeZ, liftZ, placeZ;
     double referenceAngle, travelSpeed, contactSpeed, acceleration;
     int output, settleMs;
     bool openHigh;

@@ -39,22 +39,24 @@ bool atPose(const Pose& actual, const Pose& target) {
     return cv::norm(delta) <= 0.002 && cv::norm(angularDelta) <= 0.035;
 }
 
-Pose contactPose(const Settings& cfg, const FlatPose& block) {
+Pose contactPose(const Settings& cfg, const FlatPose& block, double z) {
     const double angle = angleDelta(block.angle, cfg.referenceAngle);
     cv::Matx33d yaw;
     cv::Rodrigues(cv::Vec3d(0, 0, angle), yaw);
     cv::Vec3d rot;
     cv::Rodrigues(yaw * rotation(cfg.reference), rot);
-    return {block.xy.x, block.xy.y, cfg.reference[2], rot[0], rot[1], rot[2]};
+    return {block.xy.x, block.xy.y, z, rot[0], rot[1], rot[2]};
 }
 
 std::array<Pose, 7> waypoints(const Settings& cfg, const FlatPose& from, const FlatPose& to) {
-    const Pose pick = contactPose(cfg, from);
-    const Pose place = contactPose(cfg, to);
+    const Pose pick = contactPose(cfg, from, cfg.reference[2]);
+    const Pose place = contactPose(cfg, to, cfg.placeZ);
     Pose abovePick = pick;
+    Pose lift = pick;
     Pose abovePlace = place;
-    abovePick[2] = abovePlace[2] = cfg.park[2];
-    return {abovePick, pick, abovePick, abovePlace, place, abovePlace, cfg.park};
+    abovePick[2] = abovePlace[2] = cfg.safeZ;
+    lift[2] = cfg.liftZ;
+    return {abovePick, pick, lift, abovePlace, place, abovePlace, cfg.park};
 }
 
 void checkState(RTDEReceiveInterface& read) {
@@ -90,8 +92,9 @@ void execute(const Settings& cfg, cv::VideoCapture& camera, const Scene& initial
     if (cfg.ip.empty() || cfg.reference.size() != 6 || cfg.park.size() != 6) {
         throw std::runtime_error("Set robot.ip and teach the grasp reference and park poses before --run.");
     }
-    if (cfg.park[2] < cfg.reference[2] + cfg.layout.height) {
-        throw std::runtime_error("Park/travel Z must be at least one domino height above the grasp Z.");
+    const double clearanceZ = std::max(cfg.reference[2], cfg.placeZ) + cfg.layout.height;
+    if (std::min({cfg.safeZ, cfg.liftZ, cfg.park[2]}) < clearanceZ) {
+        throw std::runtime_error("Safe, lift, and park Z must be at least one domino height above grasp and place Z.");
     }
 
     interrupted = 0;
@@ -133,8 +136,8 @@ void execute(const Settings& cfg, cv::VideoCapture& camera, const Scene& initial
             const auto path = waypoints(cfg, observed[move.color], move.to);
             checkWaypoints(control, path);
             std::cout << "Moving " << colors[move.color] << (move.toBuffer ? " to buffer\n" : " to row\n") << std::flush;
-            go(path[0], cfg.travelSpeed);
             grip(true);
+            go(path[0], cfg.travelSpeed);
             go(path[1], cfg.contactSpeed);
             grip(false);
             go(path[2], cfg.contactSpeed);

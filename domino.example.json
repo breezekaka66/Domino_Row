@@ -11,9 +11,11 @@
     "order": ["red", "yellow", "blue"], "origin_xy_m": [0.31, -0.04],
     "direction_deg": 0.0, "spacing_m": 0.032, "buffer_xy_m": [0.38, 0.06]
   },
-  "gripper": {"do": 1, "open_high": 1, "settle_ms": 500, "half_along_width_m": 0.019, "half_along_thickness_m": 0.017, "clearance_m": 0.002},
+  "gripper": {"do": 0, "open_high": 1, "settle_ms": 1000, "half_along_width_m": 0.019, "half_along_thickness_m": 0.017, "clearance_m": 0.002},
   "robot": {
-    "ip": "", "grasp_reference_pose": [], "grasp_reference_long_axis_deg": 0.0,
-    "park_pose": [], "travel_speed_m_s": 0.05, "contact_speed_m_s": 0.02, "acceleration_m_s2": 0.2
+    "ip": "", "grasp_reference_pose": [0.0, 0.0, 0.25546, 2.182, -2.266, 0.02], "grasp_reference_long_axis_deg": 0.0,
+    "park_pose": [0.09738, -0.20041, 0.31251, 2.225, -2.219, 0.032],
+    "safe_z_m": 0.3125, "lift_z_m": 0.3125, "place_z_m": 0.2554,
+    "travel_speed_m_s": 0.05, "contact_speed_m_s": 0.02, "acceleration_m_s2": 0.2
   }
 }
