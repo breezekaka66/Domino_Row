@@ -1,0 +1,19 @@
+{
+  "camera": {"index": 0, "width": 640, "height": 480, "min_area_px": 80},
+  "hsv": {
+    "red": [[[0, 90, 60], [10, 255, 255]], [[170, 90, 60], [179, 255, 255]]],
+    "yellow": [[[18, 90, 75], [38, 255, 255]]],
+    "blue": [[[95, 85, 50], [132, 255, 255]]]
+  },
+  "calibration": {"image_px": [], "robot_xy_m": []},
+  "domino": {"height_m": 0.050, "width_m": 0.025, "thickness_m": 0.009, "size_tolerance": 0.30},
+  "row": {
+    "order": ["red", "yellow", "blue"], "origin_xy_m": [0.31, -0.04],
+    "direction_deg": 0.0, "spacing_m": 0.032, "buffer_xy_m": [0.38, 0.06]
+  },
+  "gripper": {"do": 1, "open_high": 1, "settle_ms": 500, "half_along_width_m": 0.019, "half_along_thickness_m": 0.017, "clearance_m": 0.002},
+  "robot": {
+    "ip": "", "grasp_reference_pose": [], "grasp_reference_long_axis_deg": 0.0,
+    "park_pose": [], "travel_speed_m_s": 0.05, "contact_speed_m_s": 0.02, "acceleration_m_s2": 0.2
+  }
+}
